@@ -10,6 +10,7 @@ public class Player extends Entity{
 
     public final int screenX;
     public final int screenY;
+    int hasKey = 0;
     public Player(GamePanel gamePanel, KeyHandler keyHandler){
         this.gamePanel = gamePanel;
         this.keyHandler = keyHandler;
@@ -20,6 +21,8 @@ public class Player extends Entity{
         solidArea = new Rectangle();
         solidArea.x = 8;
         solidArea.y = 16;
+        solidAreaDefaultX = solidArea.x;
+        solidAreaDefaultY = solidArea.y;
         solidArea.width = 32;
         solidArea.height = 32;
     }
@@ -44,22 +47,41 @@ public class Player extends Entity{
         if (keyHandler.upPressed || keyHandler.downPressed || keyHandler.leftPressed || keyHandler.rightPressed) {
             if (keyHandler.upPressed) {
                 direction = "up";
-                worldY -= speed;
+//                worldY -= speed;
             }
             if (keyHandler.downPressed) {
                 direction = "down";
-                worldY += speed;
+//                worldY += speed;
             }
             if (keyHandler.leftPressed) {
                 direction = "left";
-                worldX -= speed;
+//                worldX -= speed;
             }
             if (keyHandler.rightPressed) {
                 direction = "right";
-                worldX += speed;
+//                worldX += speed;
             }
             collisionOn = false;
             gamePanel.collisionCheker.checkTile(this);
+            int objIndex = gamePanel.collisionCheker.checkObject(this, true);
+            pickUpObject(objIndex);
+
+            if (collisionOn == false){
+                switch (direction){
+                    case "up":
+                        worldY -= speed;
+                        break;
+                    case "down":
+                        worldY += speed;
+                        break;
+                    case "left":
+                        worldX -= speed;
+                        break;
+                    case "right":
+                        worldX += speed;
+                        break;
+                }
+            }
             spriteCounter++;
             if (spriteCounter > 10) {
                 if (spriteNum == 1) {
@@ -68,6 +90,31 @@ public class Player extends Entity{
                     spriteNum = 1;
                 }
                 spriteCounter = 0;
+            }
+        }
+    }
+
+    public void pickUpObject(int i){
+        if (i != 9999){
+//            gamePanel.objs[i] = null;
+            String objectName = gamePanel.objs[i].name;
+
+            switch (objectName){
+                case "Key" :
+                    hasKey++;
+                    gamePanel.objs[i] = null;
+                    break;
+                case "Door" :
+                    if (hasKey > 0) {
+                        gamePanel.objs[i] = null;
+                        hasKey --;
+                    }
+                    break;
+                case "Boot" :
+                    speed += 2;
+                    gamePanel.objs[i] = null;
+                    break;
+
             }
         }
     }
